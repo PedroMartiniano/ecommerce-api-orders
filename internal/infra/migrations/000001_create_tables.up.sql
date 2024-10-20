@@ -1,13 +1,7 @@
-CREATE TABLE order_status (
-    id VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    description TEXT
-);
-
 CREATE TABLE orders (
     id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
-    status_id VARCHAR(36),
+    order_status VARCHAR(50) NOT NULL,
     total_amount FLOAT NOT NULL,
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ,
