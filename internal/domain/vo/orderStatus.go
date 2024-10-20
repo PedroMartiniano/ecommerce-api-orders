@@ -15,7 +15,14 @@ type OrderStatus struct {
 }
 
 func NewOrderStatus(value Status) OrderStatus {
+
+	
 	return OrderStatus{
 		value: value,
 	}
+}
+
+
+func (o OrderStatus) GetValue() Status {
+	return o.value
 }

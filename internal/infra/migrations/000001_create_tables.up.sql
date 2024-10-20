@@ -4,8 +4,7 @@ CREATE TABLE orders (
     order_status VARCHAR(50) NOT NULL,
     total_amount FLOAT NOT NULL,
     created_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ,
-    CONSTRAINT fk_status_id FOREIGN KEY (status_id) REFERENCES order_status(id) ON DELETE CASCADE
+    updated_at TIMESTAMPTZ
 );
 
 CREATE TABLE order_items (
@@ -15,5 +14,6 @@ CREATE TABLE order_items (
     quantity INT NOT NULL,
     unit_price FLOAT NOT NULL,
     total_price FLOAT NOT NULL,
-    created_at TIMESTAMPTZ
+    created_at TIMESTAMPTZ,
+    CONSTRAINT fk_order_id FOREIGN KEY (order_id) REFERENCES orders(id)
 );

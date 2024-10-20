@@ -16,3 +16,7 @@ func NewUUID(value string) UUID {
 		value: value,
 	}
 }
+
+func (u UUID) GetValue() string {
+	return u.value
+}
