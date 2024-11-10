@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/PedroMartiniano/ecommerce-api-orders/internal/application/ports"
+	pr "github.com/PedroMartiniano/ecommerce-api-orders/internal/application/ports/repositories"
 	"github.com/PedroMartiniano/ecommerce-api-orders/internal/configs"
 	"github.com/PedroMartiniano/ecommerce-api-orders/internal/domain/entities"
 )
@@ -13,7 +13,7 @@ type OrderItemsRepository struct {
 	db *sql.DB
 }
 
-func NewOrderItemsRepository(db *sql.DB) ports.IOrderItemsRepository {
+func NewOrderItemsRepository(db *sql.DB) pr.IOrderItemsRepository {
 	return OrderItemsRepository{
 		db: db,
 	}
@@ -34,12 +34,13 @@ func (r OrderItemsRepository) SaveOrderItems(c context.Context, orderItems []ent
 	for _, item := range orderItems {
 		_, err := stmt.ExecContext(
 			c,
-			query,
-			item.OrderID,
-			item.ProductID,
-			item.Quantity,
-			item.UnitPrice,
-			item.TotalPrice,
+			item.GetID(),
+			item.GetOrderID(),
+			item.GetProductID(),
+			item.GetQuantity(),
+			item.GetUnitPrice(),
+			item.GetTotalPrice(),
+			item.GetCreatedAt(),
 		)
 		if err != nil {
 			return []entities.OrderItem{}, configs.NewError(configs.ErrBadRequest, err)

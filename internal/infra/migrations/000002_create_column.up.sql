@@ -1,0 +1,1 @@
+ALTER TABLE orders ADD COLUMN address_id VARCHAR(36) NOT NULL;

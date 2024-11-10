@@ -8,6 +8,7 @@ const (
 	OrderStatusCancelled Status = "cancelled"
 	OrderStatusShipped   Status = "shipped"
 	OrderStatusDelivered Status = "delivered"
+	OrderStatusFailed    Status = "failed"
 )
 
 type OrderStatus struct {
@@ -16,13 +17,11 @@ type OrderStatus struct {
 
 func NewOrderStatus(value Status) OrderStatus {
 
-	
 	return OrderStatus{
 		value: value,
 	}
 }
 
-
-func (o OrderStatus) GetValue() Status {
-	return o.value
+func (o OrderStatus) GetValue() string {
+	return string(o.value)
 }
