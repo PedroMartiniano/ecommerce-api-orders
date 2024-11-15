@@ -19,6 +19,18 @@ func NewOrdersController(ordersService *services.OrdersService) *OrdersControlle
 	}
 }
 
+// @Summary Create a new order
+// @Description Create a new order with the given details
+// @Security BearerAuth
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Param order body CreateOrderRequest true "Request body"
+// @Success 201 {object} orderResponse1
+// @Failure 401 {object} errorResponse
+// @Failure 400 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Router /orders/ [post]
 func (o *OrdersController) CreateOrderHandler(c *gin.Context) {
 	var request CreateOrderRequest
 
@@ -48,7 +60,7 @@ func (o *OrdersController) CreateOrderHandler(c *gin.Context) {
 			Quantity:  item.Quantity,
 		})
 	}
-	err := o.ordersService.CreateOrderExecute(c, dtos.OrderDTO{
+	order, err := o.ordersService.CreateOrderExecute(c, dtos.OrderDTO{
 		Token:       token,
 		UserID:      userParsed.ID,
 		AddressID:   request.AddressID,
@@ -67,5 +79,5 @@ func (o *OrdersController) CreateOrderHandler(c *gin.Context) {
 		return
 	}
 
-	sendSuccess(c, http.StatusCreated, "Order processed successfully")
+	sendSuccess(c, http.StatusCreated, order)
 }

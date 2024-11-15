@@ -29,35 +29,37 @@ func NewOrdersService(ordersRepository pr.IOrderRepository, orderItemsRepository
 	}
 }
 
-func (s *OrdersService) CreateOrderExecute(c context.Context, orderDTO dtos.OrderDTO) error {
+func (s *OrdersService) CreateOrderExecute(c context.Context, orderDTO dtos.OrderDTO) (dtos.OrderResDTO, error) {
 	order, err := entities.CreateNewOrder(orderDTO.UserID, orderDTO.AddressID, orderDTO.TotalAmount)
 	if err != nil {
-		return configs.NewError(configs.ErrBadRequest, err)
+		return dtos.OrderResDTO{}, configs.NewError(configs.ErrBadRequest, err)
 	}
 
 	orderItems := []entities.OrderItem{}
-	for _, item := range orderDTO.Items {
-		orderItem, err := entities.CreateNewOrderItem(order.GetID(), item.ProductID, item.Quantity, item.UnitPrice, item.TotalPrice)
-		if err != nil {
-			return err
-		}
-		orderItems = append(orderItems, orderItem)
-	}
-
 	for _, item := range orderDTO.Items {
 		product, err := s.productGateway.GetProductByID(item.ProductID)
 		if err != nil {
 			order.FailOrder()
 			s.ordersRepository.SaveOrder(c, order)
-			return err
+			return dtos.OrderResDTO{}, configs.NewError(configs.ErrBadRequest, err)
 		}
-		logger.Debugf("%+v", product)
+
+		if product.Price != item.UnitPrice {
+			item.UnitPrice = product.Price
+		}
+
 		if product.Quantity < item.Quantity {
 			order.FailOrder()
 			s.ordersRepository.SaveOrder(c, order)
-			return configs.NewError(configs.ErrBadRequest, errors.New("quantidade do produto '"+product.Name+"' insuficiente"))
+			return dtos.OrderResDTO{}, configs.NewError(configs.ErrBadRequest, errors.New("quantidade do produto '"+product.Name+"' insuficiente"))
 		}
 
+		item.TotalPrice = float64(item.Quantity) * item.UnitPrice
+		orderItem, err := entities.CreateNewOrderItem(order.GetID(), item.ProductID, item.Quantity, item.UnitPrice, item.TotalPrice)
+		if err != nil {
+			return dtos.OrderResDTO{}, configs.NewError(configs.ErrBadRequest, err)
+		}
+		orderItems = append(orderItems, orderItem)
 	}
 
 	err = s.paymentGateway.ProcessPayment(dtos.ProcessPaymentDTO{
@@ -71,12 +73,12 @@ func (s *OrdersService) CreateOrderExecute(c context.Context, orderDTO dtos.Orde
 	if err != nil {
 		order.FailOrder()
 		s.ordersRepository.SaveOrder(c, order)
-		return err
+		return dtos.OrderResDTO{}, err
 	}
 
-	for _, item := range orderDTO.Items {	
+	for _, item := range orderDTO.Items {
 		err = s.productGateway.UpdateProductQuantity(dtos.UpdateProductQuantityDTO{
-			Token:       orderDTO.Token,
+			Token:     orderDTO.Token,
 			ProductID: item.ProductID,
 			Quantity:  item.Quantity,
 			Operation: "remove",
@@ -84,19 +86,27 @@ func (s *OrdersService) CreateOrderExecute(c context.Context, orderDTO dtos.Orde
 		if err != nil {
 			order.FailOrder()
 			s.ordersRepository.SaveOrder(c, order)
-			return err
+			return dtos.OrderResDTO{}, err
 		}
 	}
 
 	order, err = s.ordersRepository.SaveOrder(c, order)
 	if err != nil {
-		return err
+		return dtos.OrderResDTO{}, err
 	}
 
 	_, err = s.orderItemsRepository.SaveOrderItems(c, orderItems)
 	if err != nil {
-		return err
+		return dtos.OrderResDTO{}, err
 	}
 
-	return nil
+	return dtos.OrderResDTO{
+		ID:          order.GetID(),
+		UserID:      order.GetUserID(),
+		AddressID:   order.GetAddressID(),
+		TotalAmount: order.GetTotalAmount(),
+		Status:      order.GetOrderStatus(),
+		CreatedAt:   order.GetCreatedAt(),
+		UpdatedAt:   order.GetUpdatedAt(),
+	}, nil
 }

@@ -1,5 +1,7 @@
 package dtos
 
+import "time"
+
 type OrderDTO struct {
 	Token          string         `json:"token"`
 	UserID         string         `json:"user_id"`
@@ -26,4 +28,14 @@ type PaymentDetails struct {
 	CardNumber     string `json:"card_number"`
 	ExpirationDate string `json:"expiration_date"`
 	CVV            string `json:"cvv"`
+}
+
+type OrderResDTO struct {
+	ID          string    `json:"id"`
+	UserID      string    `json:"user_id"`
+	AddressID   string    `json:"address_id"`
+	TotalAmount float64   `json:"total_amount"`
+	Status      string    `json:"status"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
