@@ -1,0 +1,106 @@
+definitions:
+  controllers.CreateOrderRequest:
+    properties:
+      address_id:
+        type: string
+      items:
+        items:
+          properties:
+            product_id:
+              type: string
+            quantity:
+              type: integer
+            unit_price:
+              type: number
+          type: object
+        type: array
+      payment_details:
+        properties:
+          card_holder:
+            type: string
+          card_number:
+            type: string
+          cvv:
+            type: string
+          expiration_date:
+            type: string
+        type: object
+      total_amount:
+        type: number
+    type: object
+  controllers.errorResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  controllers.orderResponse1:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.OrderResDTO'
+      success:
+        type: boolean
+    type: object
+  dtos.OrderResDTO:
+    properties:
+      address_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      total_amount:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /orders/:
+    post:
+      consumes:
+      - application/json
+      description: Create a new order with the given details
+      parameters:
+      - description: Request body
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controllers.orderResponse1'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controllers.errorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new order
+      tags:
+      - orders
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

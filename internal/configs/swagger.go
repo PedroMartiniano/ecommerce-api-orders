@@ -3,8 +3,8 @@ package configs
 import "github.com/swaggo/swag"
 
 func SwaggerConfigure(infos *swag.Spec) {
-	infos.Title = "E-commerce API Products"
-	infos.Description = "API Rest for product and stock management"
+	infos.Title = "E-commerce API Orders"
+	infos.Description = "API Rest for order management"
 	infos.Host = "localhost:8092"
 	infos.BasePath = "/"
 	infos.Version = "1.0"
