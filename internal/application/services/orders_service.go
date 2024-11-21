@@ -65,6 +65,7 @@ func (s *OrdersService) CreateOrderExecute(c context.Context, orderDTO dtos.Orde
 	err = s.paymentGateway.ProcessPayment(dtos.ProcessPaymentDTO{
 		OrderID:        order.GetID(),
 		Amount:         order.GetTotalAmount(),
+		UserID:         orderDTO.UserID,
 		CardHolder:     orderDTO.PaymentDetails.CardHolder,
 		CardNumber:     orderDTO.PaymentDetails.CardNumber,
 		ExpirationDate: orderDTO.PaymentDetails.ExpirationDate,

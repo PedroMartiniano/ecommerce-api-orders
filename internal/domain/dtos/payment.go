@@ -2,6 +2,7 @@ package dtos
 
 type ProcessPaymentDTO struct {
 	OrderID        string  `json:"order_id"`
+	UserID         string  `json:"user_id"`
 	CardHolder     string  `json:"card_holder"`
 	CardNumber     string  `json:"card_number"`
 	ExpirationDate string  `json:"expiration_date"`

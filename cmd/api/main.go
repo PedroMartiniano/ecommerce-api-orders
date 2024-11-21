@@ -18,7 +18,10 @@ func main() {
 
 	server := gin.Default()
 
-	routes.InitRoutes(server)
+	err := routes.InitRoutes(server)
+	if err != nil {
+		panic(err.Error())
+	}
 
 	port := configs.GetEnv("PORT")
 	server.Run(fmt.Sprintf(":%s", port))

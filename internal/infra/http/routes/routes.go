@@ -8,11 +8,16 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func InitRoutes(server *gin.Engine) {
+func InitRoutes(server *gin.Engine) error {
+	var err error
 	configs.SwaggerConfigure(docs.SwaggerInfo)
 
 	orderRouter := server.Group("/orders")
-	orderRoutes(orderRouter)
+	err = orderRoutes(orderRouter)
+	if err != nil {
+		return err
+	}
 
 	server.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	return nil
 }
